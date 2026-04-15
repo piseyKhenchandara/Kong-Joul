@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../../data/repositories/station_repository.dart';
+import '../../../model/active_ride.dart';
 import '../../../model/station.dart';
 
 class MapViewModel extends ChangeNotifier {
@@ -19,6 +22,9 @@ class MapViewModel extends ChangeNotifier {
   Station? _selectedStation;
   LatLng? _userLocation;
   bool _showDetailPanel = false;
+  ActiveRide? _activeRide;
+  Duration _rideDuration = Duration.zero;
+  Timer? _rideTimer;
 
   List<Station> get stations => _stations;
   bool get isLoading => _isLoading;
@@ -26,6 +32,32 @@ class MapViewModel extends ChangeNotifier {
   Station? get selectedStation => _selectedStation;
   LatLng? get userLocation => _userLocation;
   bool get showDetailPanel => _showDetailPanel;
+  ActiveRide? get activeRide => _activeRide;
+  bool get isRiding => _activeRide != null;
+  Duration get rideDuration => _rideDuration;
+
+  void onRideStarted(ActiveRide ride) {
+    _activeRide = ride;
+    _showDetailPanel = false;
+    _selectedStation = null;
+    _rideDuration = Duration.zero;
+    _rideTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      _rideDuration += const Duration(seconds: 1);
+      notifyListeners();
+    });
+    notifyListeners();
+    fetchStations();
+  }
+
+  void onRideEnded() {
+    _rideTimer?.cancel();
+    _activeRide = null;
+    _rideDuration = Duration.zero;
+    _selectedStation = null;
+    _showDetailPanel = false;
+    notifyListeners();
+    fetchStations();
+  }
 
   void selectStation(Station station) {
     _selectedStation = station;
@@ -76,6 +108,10 @@ class MapViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  @override
+  void dispose() {
+    _rideTimer?.cancel();
+    super.dispose();
+  }
 }
-
-

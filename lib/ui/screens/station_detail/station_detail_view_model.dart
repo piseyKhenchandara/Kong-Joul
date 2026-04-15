@@ -3,14 +3,17 @@ import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../../data/repositories/bike_repository.dart';
+import '../../../data/repositories/ride_repository.dart';
+import '../../../model/active_ride.dart';
 import '../../../model/bike.dart';
 import '../../../model/station.dart';
 
 class StationDetailViewModel extends ChangeNotifier {
   final Station _station;
   final BikeRepository _bikeRepository;
+  final RideRepository _rideRepository;
 
-  StationDetailViewModel(this._station, this._bikeRepository) {
+  StationDetailViewModel(this._station, this._bikeRepository, this._rideRepository) {
     _load();
   }
 
@@ -20,12 +23,16 @@ class StationDetailViewModel extends ChangeNotifier {
   bool _isLoading = true;
   String? _error;
   String? _distanceText;
+  bool _isStartingRide = false;
+  String? _rideError;
 
   List<Bike> get bikes => _bikes;
   bool get isLoading => _isLoading;
   String? get error => _error;
   String? get distanceText => _distanceText;
   int get availableCount => _bikes.length;
+  bool get isStartingRide => _isStartingRide;
+  String? get rideError => _rideError;
 
   Future<void> _load() async {
     _isLoading = true;
@@ -68,6 +75,28 @@ class StationDetailViewModel extends ChangeNotifier {
           meters < 1000 ? '${meters.round()}m' : '${(meters / 1000).toStringAsFixed(1)}km';
     } catch (_) {
       // silently ignore — distance stays null
+    }
+  }
+
+  Future<ActiveRide?> startRide(Bike bike) async {
+    _isStartingRide = true;
+    _rideError = null;
+    notifyListeners();
+
+    try {
+      final ride = await _rideRepository.startRide(
+        bikeId: bike.id,
+        bikeNumber: bike.bikeNumber,
+        stationId: _station.id,
+        slotNumber: bike.slotNumber,
+      );
+      return ride;
+    } catch (e) {
+      _rideError = e.toString();
+      return null;
+    } finally {
+      _isStartingRide = false;
+      notifyListeners();
     }
   }
 }
