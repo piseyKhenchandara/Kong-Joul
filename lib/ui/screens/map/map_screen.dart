@@ -3,14 +3,18 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:mini_velo/ui/theme/app_colors.dart';
 import 'package:provider/provider.dart';
 
 import '../../../config/map_config.dart';
 import '../../../data/repositories/bike_repository.dart';
+import '../../../data/repositories/ride_repository.dart';
 import '../../../data/repositories/station_repository.dart';
-import '../../theme/app_colors.dart';
 import '../station_detail/station_detail_view_model.dart';
 import 'map_view_model.dart';
+import 'return_station_panel.dart';
+import 'return_station_panel_view_model.dart';
+import 'ride_bar.dart';
 import 'station_detail_panel.dart';
 
 class MapScreen extends StatelessWidget {
@@ -46,7 +50,8 @@ class _MapView extends StatelessWidget {
             options: MapOptions(
               initialCenter: LatLng(MapConfig.defaultLat, MapConfig.defaultLng),
               initialZoom: MapConfig.defaultZoom,
-              onTap: (tapPosition, point) => context.read<MapViewModel>().deselectStation(),
+              onTap: (tapPosition, point) =>
+                  context.read<MapViewModel>().deselectStation(),
             ),
             children: [
               TileLayer(
@@ -59,7 +64,10 @@ class _MapView extends StatelessWidget {
                     Polyline(
                       points: [
                         vm.userLocation!,
-                        LatLng(vm.selectedStation!.lat, vm.selectedStation!.lng),
+                        LatLng(
+                          vm.selectedStation!.lat,
+                          vm.selectedStation!.lng,
+                        ),
                       ],
                       color: Colors.blue,
                       strokeWidth: 4,
@@ -68,16 +76,20 @@ class _MapView extends StatelessWidget {
                 ),
               MarkerLayer(
                 markers: vm.stations
-                    .map((s) => Marker(
-                          point: LatLng(s.lat, s.lng),
-                          width: 72,
-                          height: 52,
-                          child: GestureDetector(
-                            onTap: () =>
-                                context.read<MapViewModel>().selectStation(s),
-                            child: _StationBubble(bikeCount: s.availableBikes),
+                    .map(
+                      (s) => Marker(
+                        point: LatLng(s.lat, s.lng),
+                        width: 72,
+                        height: 52,
+                        child: GestureDetector(
+                          onTap: () =>
+                              context.read<MapViewModel>().selectStation(s),
+                          child: _StationBubble(
+                            count: vm.isRiding ? s.availableDocks : s.availableBikes,
                           ),
-                        ))
+                        ),
+                      ),
+                    )
                     .toList(),
               ),
               if (vm.userLocation != null)
@@ -93,10 +105,7 @@ class _MapView extends StatelessWidget {
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white, width: 3),
                           boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 4,
-                            ),
+                            BoxShadow(color: Colors.black26, blurRadius: 4),
                           ],
                         ),
                       ),
@@ -105,42 +114,71 @@ class _MapView extends StatelessWidget {
                 ),
             ],
           ),
+          // Top overlay — ride bar + search bar
           SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search Station',
-                  hintStyle: const TextStyle(color: Colors.grey),
-                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: EdgeInsets.zero,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide.none,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (vm.isRiding)
+                  RideBar(
+                    ride: vm.activeRide!,
+                    duration: vm.rideDuration,
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide.none,
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 8),
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: vm.isRiding
+                          ? 'Search Return Station'
+                          : 'Search Station',
+                      hintStyle: const TextStyle(color: Colors.grey),
+                      prefixIcon:
+                          const Icon(Icons.search, color: Colors.grey),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: EdgeInsets.zero,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
           ),
+          // Bottom panel — station detail OR return station
           if (vm.showDetailPanel && vm.selectedStation != null)
             Positioned(
               bottom: 0,
               left: 0,
               right: 0,
-              child: ChangeNotifierProvider(
-                key: ValueKey(vm.selectedStation!.id),
-                create: (_) => StationDetailViewModel(
-                  vm.selectedStation!,
-                  BikeRepository(),
-                ),
-                child: const StationDetailPanel(),
-              ),
+              child: vm.isRiding
+                  ? ChangeNotifierProvider(
+                      key: ValueKey('return_${vm.selectedStation!.id}'),
+                      create: (_) => ReturnStationPanelViewModel(
+                        vm.selectedStation!,
+                        vm.activeRide!,
+                        vm.rideDuration,
+                        BikeRepository(),
+                        RideRepository(),
+                      ),
+                      child: const ReturnStationPanel(),
+                    )
+                  : ChangeNotifierProvider(
+                      key: ValueKey(vm.selectedStation!.id),
+                      create: (_) => StationDetailViewModel(
+                        vm.selectedStation!,
+                        BikeRepository(),
+                        RideRepository(),
+                      ),
+                      child: const StationDetailPanel(),
+                    ),
             ),
         ],
       ),
@@ -149,9 +187,15 @@ class _MapView extends StatelessWidget {
 }
 
 class _StationBubble extends StatelessWidget {
-  final int bikeCount;
+  final int count;
 
-  const _StationBubble({required this.bikeCount});
+  const _StationBubble({required this.count});
+
+  Color get _bubbleColor {
+    if (count <= 3) return Colors.red;
+    if (count < 6) return Colors.orange;
+    return AppColors.primary;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -161,7 +205,7 @@ class _StationBubble extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: AppColors.primary,
+            color: _bubbleColor,
             borderRadius: BorderRadius.circular(10),
             boxShadow: const [
               BoxShadow(
@@ -171,7 +215,7 @@ class _StationBubble extends StatelessWidget {
             ],
           ),
           child: Text(
-            '$bikeCount',
+            '$count',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 16,
@@ -180,7 +224,7 @@ class _StationBubble extends StatelessWidget {
           ),
         ),
         CustomPaint(
-          painter: _TrianglePainter(),
+          painter: _TrianglePainter(color: _bubbleColor),
           size: const Size(12, 8),
         ),
       ],
@@ -189,6 +233,9 @@ class _StationBubble extends StatelessWidget {
 }
 
 class _TrianglePainter extends CustomPainter {
+  final Color color;
+  const _TrianglePainter({required this.color});
+
   @override
   void paint(Canvas canvas, Size size) {
     final path = ui.Path()
@@ -196,9 +243,9 @@ class _TrianglePainter extends CustomPainter {
       ..lineTo(size.width / 2, size.height)
       ..lineTo(size.width, 0)
       ..close();
-    canvas.drawPath(path, Paint()..color = AppColors.primary);
+    canvas.drawPath(path, Paint()..color = color);
   }
 
   @override
-  bool shouldRepaint(_TrianglePainter oldDelegate) => false;
+  bool shouldRepaint(_TrianglePainter oldDelegate) => oldDelegate.color != color;
 }

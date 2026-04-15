@@ -1,10 +1,11 @@
 class Station {
   final String id;
   final String name;
-  final double lat; // y axis
-  final double lng; // x axis
+  final double lat;
+  final double lng;
   final int availableBikes;
   final int totalDocks;
+  final int availableDocks;
 
   const Station({
     required this.id,
@@ -13,7 +14,7 @@ class Station {
     required this.lng,
     required this.availableBikes,
     required this.totalDocks,
+    required this.availableDocks,
   });
-
-  int get emptyDocks => totalDocks - availableBikes;
 }
+

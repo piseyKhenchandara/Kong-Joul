@@ -21,11 +21,7 @@ class StationDetailPanel extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 10,
-            offset: Offset(0, -2),
-          ),
+          BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, -2)),
         ],
       ),
       child: Column(
@@ -49,10 +45,7 @@ class StationDetailPanel extends StatelessWidget {
                 Expanded(
                   child: Text(
                     vm.station.name,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
                 GestureDetector(
@@ -106,7 +99,25 @@ class StationDetailPanel extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
+          // hint text
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              'Tap a bike to start your ride',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+          ),
+          // ride error
+          if (vm.rideError != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              child: Text(
+                'Failed to start ride: ${vm.rideError}',
+                style: const TextStyle(fontSize: 12, color: Colors.red),
+              ),
+            ),
+          const SizedBox(height: 8),
           // bike list
           if (vm.isLoading)
             const Padding(
@@ -116,13 +127,24 @@ class StationDetailPanel extends StatelessWidget {
           else if (vm.error != null)
             Padding(
               padding: const EdgeInsets.all(16),
-              child: Text(
-                'Error: ${vm.error}',
-                style: const TextStyle(color: Colors.red),
-              ),
+              child: Text('Error: ${vm.error}',
+                  style: const TextStyle(color: Colors.red)),
             )
           else
-            Flexible(child: _BikePanelList(bikes: vm.bikes)),
+            Flexible(
+              child: _BikePanelList(
+                bikes: vm.bikes,
+                isStartingRide: vm.isStartingRide,
+                onBikeTap: (bike) async {
+                  final mapVm = context.read<MapViewModel>();
+                  final detailVm = context.read<StationDetailViewModel>();
+                  final ride = await detailVm.startRide(bike);
+                  if (ride != null && context.mounted) {
+                    mapVm.onRideStarted(ride);
+                  }
+                },
+              ),
+            ),
         ],
       ),
     );
@@ -131,8 +153,14 @@ class StationDetailPanel extends StatelessWidget {
 
 class _BikePanelList extends StatelessWidget {
   final List<Bike> bikes;
+  final bool isStartingRide;
+  final Future<void> Function(Bike) onBikeTap;
 
-  const _BikePanelList({required this.bikes});
+  const _BikePanelList({
+    required this.bikes,
+    required this.isStartingRide,
+    required this.onBikeTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -143,24 +171,37 @@ class _BikePanelList extends StatelessWidget {
       );
     }
 
-    return ListView(
-      shrinkWrap: true,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      children: bikes
-          .map(
-            (bike) => Container(
-              padding: EdgeInsets.all(12),
-              margin: EdgeInsets.only(bottom: 5),
-              decoration: BoxDecoration(
-                color: Colors.white,
-            
-                border: Border.all(color: AppColors.primary, width: 3),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: _BikePanelRow(bike: bike),
+    return Stack(
+      children: [
+        ListView(
+          shrinkWrap: true,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          children: bikes
+              .map(
+                (bike) => GestureDetector(
+                  onTap: isStartingRide ? null : () => onBikeTap(bike),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(bottom: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: AppColors.primary, width: 2),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: _BikePanelRow(bike: bike),
+                  ),
+                ),
+              )
+              .toList(),
+        ),
+        if (isStartingRide)
+          const Positioned.fill(
+            child: ColoredBox(
+              color: Colors.white54,
+              child: Center(child: CircularProgressIndicator()),
             ),
-          )
-          .toList(),
+          ),
+      ],
     );
   }
 }
@@ -172,38 +213,34 @@ class _BikePanelRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        children: [
-          Image.asset(
-            'assets/images/bike_in_view_bike_in_a_station_detail.png',
-            width: 60,
-            height: 44,
-            fit: BoxFit.contain,
-            errorBuilder: (context, error, stackTrace) =>
-                const Icon(Icons.directions_bike, size: 40, color: Colors.grey),
-          ),
-          const SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'BikeId: ${bike.bikeNumber}',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Slot: #${bike.slotNumber}',
-                style: const TextStyle(fontSize: 13, color: Colors.grey),
-              ),
-            ],
-          ),
-        ],
-      ),
+    return Row(
+      children: [
+        Image.asset(
+          'assets/images/bike_in_view_bike_in_a_station_detail.png',
+          width: 60,
+          height: 44,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) =>
+              const Icon(Icons.directions_bike, size: 40, color: Colors.grey),
+        ),
+        const SizedBox(width: 16),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'BikeId: ${bike.bikeNumber}',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Slot: #${bike.slotNumber}',
+              style: const TextStyle(fontSize: 13, color: Colors.grey),
+            ),
+          ],
+        ),
+        const Spacer(),
+        const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+      ],
     );
   }
 }
