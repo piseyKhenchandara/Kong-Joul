@@ -171,12 +171,8 @@ class _LoginView extends StatelessWidget {
       return;
     }
 
-    final message = vm.errorMessage;
-    if (message != null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(message)));
-    }
+    // Sign-in errors are already rendered inline via the view model state.
+    // Avoid also showing the same message in a SnackBar.
   }
 }
 
