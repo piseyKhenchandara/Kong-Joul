@@ -116,7 +116,7 @@ class PlanPanel extends StatelessWidget {
     if (time == 24) return "Full day access";
     if (time == 168) return "Full week access";
     if (time == 720) return "Full month access";
-    return "$time hours access";
+    return "$time days access";
   }
 
   // 🔹 helper: time text

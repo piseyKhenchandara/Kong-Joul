@@ -56,4 +56,29 @@ class PlanRepository {
       'end_date': expiresAt?.toIso8601String(),
     });
   }
+
+  Future<Map<String, dynamic>> fetchUserRideStats(String userId) async {
+    final data = await _client
+        .from('rides')
+        .select('duration_seconds')
+        .eq('user_id', userId)
+        .eq('status', 'completed');
+
+    if ((data as List).isEmpty) {
+      return {'total_rides': 0, 'total_duration_seconds': 0};
+    }
+
+    int totalDurationSeconds = 0;
+    for (var ride in data) {
+      final duration = ride['duration_seconds'] as int?;
+      if (duration != null) {
+        totalDurationSeconds += duration;
+      }
+    }
+
+    return {
+      'total_rides': data.length,
+      'total_duration_seconds': totalDurationSeconds,
+    };
+  }
 }
