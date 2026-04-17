@@ -160,7 +160,6 @@ class _MapViewState extends State<_MapView> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(height: 50,),
                 if (vm.isRiding)
                   RideBar(ride: vm.activeRide!, duration: vm.rideDuration),
                 SearchSection(
