@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mini_velo/ui/screens/welcome/welcome_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'ui/screens/shell/main_shell.dart';
@@ -25,7 +26,7 @@ class VeloToulouseApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
         useMaterial3: true,
       ),
-      home: const MainShell(),
+      home: const WelcomeScreen(),
     );
   }
 }
