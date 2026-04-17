@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/active_plan_banner.dart';
+import '../../widgets/payment_confirm_sheet.dart';
 import 'plan_panel.dart';
 import 'plan_view_model.dart';
 
@@ -16,19 +17,41 @@ class _PlansScreenState extends State<PlansScreen> {
   @override
   void initState() {
     super.initState();
-
-    Future.microtask(() async {
-      //final userId = Supabase.instance.client.auth.currentUser?.id;
+    Future.microtask(() {
       final userId = "9e2536f0-d025-420c-9112-ec279dc6b146";
       final vm = context.read<PlanViewModel>();
+      vm.init(userId);
+        });
+  }
 
-      // if (userId != null) {
-      //   await vm.init(userId); // loads plans + active plan
-      // } else {
-      //   await vm.fetchAllPlans(); // loads plans only
-      // }
-      await vm.init(userId); // loads plans + active plan
-    });
+  void _showPaymentSheet(BuildContext context, PlanViewModel vm, plan) {
+    final userId = "9e2536f0-d025-420c-9112-ec279dc6b146";
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) => PaymentConfirmSheet(
+        plan: plan,
+        onConfirm: () async {
+          Navigator.pop(context); // close sheet
+          final success = await vm.buyPlan(userId, plan);
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  success
+                      ? 'Plan activated!'
+                      : 'Purchase failed. Try again.',
+                ),
+                backgroundColor: success ? Colors.green : Colors.red,
+              ),
+            );
+          }
+        },
+      ),
+    );
   }
 
   @override
@@ -45,7 +68,6 @@ class _PlansScreenState extends State<PlansScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-
       body: Column(
         children: [
           const SizedBox(height: 50),
@@ -61,29 +83,31 @@ class _PlansScreenState extends State<PlansScreen> {
 
           const SizedBox(height: 10),
 
+          // 🔹 active plan banner with countdown
+          if (vm.activePlan != null)
+            ActivePlanBanner(
+              planName: vm.activePlan!.planName,
+              expiresAt: vm.expiresAt,
+            ),
+
+          const SizedBox(height: 10),
+
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16),
-
               child: ListView.builder(
                 itemCount: vm.plans.length,
                 itemBuilder: (context, index) {
                   final plan = vm.plans[index];
-
                   final isActive = vm.activePlan?.planName == plan.planName;
                   final isSelected = vm.selectedPlan?.planName == plan.planName;
 
                   return GestureDetector(
-                    onTap: () {
-                      vm.selectPlan(plan);
-                    },
-
+                    onTap: () => vm.selectPlan(plan),
                     child: Container(
                       margin: const EdgeInsets.only(bottom: 12),
-
                       child: Padding(
                         padding: const EdgeInsets.all(12),
-
                         child: Row(
                           children: [
                             Expanded(
@@ -93,23 +117,16 @@ class _PlansScreenState extends State<PlansScreen> {
                                 isSelected: isSelected,
                               ),
                             ),
-
                             const SizedBox(width: 10),
-
                             ElevatedButton(
                               onPressed: isActive
                                   ? null
-                                  : () {
-                                      vm.selectPlan(plan);
-                                      // 👉 later: call buy API here
-                                    },
-
+                                  : () => _showPaymentSheet(context, vm, plan),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: isActive
                                     ? Colors.grey
                                     : AppColors.primary,
                               ),
-
                               child: Text(isActive ? "Active" : "Buy"),
                             ),
                           ],
