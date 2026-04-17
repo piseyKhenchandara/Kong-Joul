@@ -34,96 +34,99 @@ class PaymentConfirmSheet extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // handle bar
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(2),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // handle bar
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
-          ),
-          const SizedBox(height: 24),
+            const SizedBox(height: 24),
 
-          const Text(
-            "Confirm Payment",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 24),
-
-          // plan info card
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(16),
+            const Text(
+              "Confirm Payment",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _formatPlanName(plan.planName),
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+            const SizedBox(height: 24),
+
+            // plan info card
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _formatPlanName(plan.planName),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
+                      const SizedBox(height: 4),
+                      Text(
+                        plan.time == 0
+                            ? "Single ride"
+                            : "Valid for ${plan.time} hours",
+                        style: const TextStyle(color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    "\$${plan.price.toStringAsFixed(2)}",
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green,
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      plan.time == 0
-                          ? "Single ride"
-                          : "Valid for ${plan.time} hours",
-                      style: const TextStyle(color: Colors.grey),
-                    ),
-                  ],
-                ),
-                Text(
-                  "\$${plan.price.toStringAsFixed(2)}",
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green,
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 32),
+
+            // confirm button
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: ElevatedButton(
+                onPressed: onConfirm,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 32),
-
-          // confirm button
-          SizedBox(
-            width: double.infinity,
-            height: 52,
-            child: ElevatedButton(
-              onPressed: onConfirm,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
+                child: const Text(
+                  "Confirm & Pay",
+                  style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
               ),
-              child: const Text(
-                "Confirm & Pay",
-                style: TextStyle(fontSize: 16, color: Colors.white),
-              ),
             ),
-          ),
 
-          const SizedBox(height: 12),
+            const SizedBox(height: 12),
 
-          // cancel
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
-          ),
-        ],
+            // cancel
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+            ),
+            SizedBox(height: MediaQuery.of(context).padding.bottom),
+          ],
+        ),
       ),
     );
   }
