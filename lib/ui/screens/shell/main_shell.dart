@@ -5,6 +5,8 @@ import '../profile/account_screen.dart';
 import '../subscription/plans_screen.dart';
 import '../../theme/app_colors.dart';
 
+enum NavTab { map, plans, account }
+
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
@@ -13,7 +15,7 @@ class MainShell extends StatefulWidget {
 }
 
 class _MainShellState extends State<MainShell> {
-  int _currentIndex = 0;
+  NavTab _currentTab = NavTab.map;
 
   final List<Widget> _screens = const [
     MapScreen(),
@@ -24,7 +26,7 @@ class _MainShellState extends State<MainShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _screens[_currentIndex],
+      body: _screens[_currentTab.index],
       bottomNavigationBar: _buildBottomNav(),
     );
   }
@@ -50,22 +52,22 @@ class _MainShellState extends State<MainShell> {
               _NavItem(
                 icon: Icons.map_outlined,
                 label: 'Map',
-                index: 0,
-                currentIndex: _currentIndex,
+                tab: NavTab.map,
+                currentTab: _currentTab,
                 onTap: _onTap,
               ),
               _NavItem(
                 icon: Icons.card_membership_outlined,
                 label: 'Plans',
-                index: 1,
-                currentIndex: _currentIndex,
+                tab: NavTab.plans,
+                currentTab: _currentTab,
                 onTap: _onTap,
               ),
               _NavItem(
                 icon: Icons.person_outline,
                 label: 'Account',
-                index: 2,
-                currentIndex: _currentIndex,
+                tab: NavTab.account,
+                currentTab: _currentTab,
                 onTap: _onTap,
               ),
             ],
@@ -75,30 +77,30 @@ class _MainShellState extends State<MainShell> {
     );
   }
 
-  void _onTap(int index) => setState(() => _currentIndex = index);
+  void _onTap(NavTab tab) => setState(() => _currentTab = tab);
 }
 
 class _NavItem extends StatelessWidget {
   final IconData icon;
   final String label;
-  final int index;
-  final int currentIndex;
-  final void Function(int) onTap;
+  final NavTab tab;
+  final NavTab currentTab;
+  final void Function(NavTab) onTap;
 
   const _NavItem({
     required this.icon,
     required this.label,
-    required this.index,
-    required this.currentIndex,
+    required this.tab,
+    required this.currentTab,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final bool isActive = index == currentIndex;
+    final bool isActive = tab == currentTab;
 
     return GestureDetector(
-      onTap: () => onTap(index),
+      onTap: () => onTap(tab),
       behavior: HitTestBehavior.opaque,
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -107,14 +109,10 @@ class _NavItem extends StatelessWidget {
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: isActive ? AppColors.primary : Colors.transparent, //
+              color: isActive ? AppColors.primary : Colors.transparent,
               borderRadius: BorderRadius.circular(20),
             ),
-            child: Icon(
-              icon,
-              color: Colors.black, //  always black
-              size: 24,
-            ),
+            child: Icon(icon, color: Colors.black, size: 24),
           ),
           const SizedBox(height: 4),
           Text(

@@ -26,7 +26,6 @@ void main() async {
   );
 }
 
-
 class VeloToulouseApp extends StatelessWidget {
   const VeloToulouseApp({super.key});
 

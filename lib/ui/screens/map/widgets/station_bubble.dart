@@ -2,18 +2,14 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
-import '../../../theme/app_colors.dart';
+import '../../../../ui/theme/station_availability.dart';
 
 class StationBubble extends StatelessWidget {
   final int count;
 
   const StationBubble({required this.count, super.key});
 
-  Color get _bubbleColor {
-    if (count <= 3) return Colors.red;
-    if (count < 6) return Colors.orange;
-    return AppColors.primary;
-  }
+  Color get _bubbleColor => StationAvailability.fromCount(count).color;
 
   @override
   Widget build(BuildContext context) {
