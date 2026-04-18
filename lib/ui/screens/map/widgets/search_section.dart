@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../model/station.dart';
-import '../../../theme/app_colors.dart';
+import '../../../../ui/theme/station_availability.dart';
 import '../map_view_model.dart';
 
 class SearchSection extends StatelessWidget {
@@ -82,11 +82,7 @@ class SearchSection extends StatelessWidget {
                       ? s.availableDocks
                       : s.availableBikes;
                   final label = vm.isRiding ? 'free slots' : 'bikes';
-                  final dotColor = dockCount <= 3
-                      ? Colors.red
-                      : dockCount < 6
-                      ? Colors.orange
-                      : AppColors.primary;
+                  final dotColor = StationAvailability.fromCount(dockCount).color;
                   return InkWell(
                     borderRadius: BorderRadius.circular(12),
                     onTap: () => onSuggestionTap(s),
