@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../dto/ride_dto.dart';
 import '../../model/active_ride.dart';
 import '../../model/bike_status.dart';
 import '../../model/ride_status.dart';
@@ -30,7 +31,7 @@ class RideRepository {
       'slot_number': null,
     }).eq('id', bikeId);
 
-    return ActiveRide.fromJson(rideData);
+    return RideDto.fromJson(rideData).toActiveRide();
   }
 
   Future<void> endRide({

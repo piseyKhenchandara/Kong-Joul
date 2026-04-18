@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../theme/app_colors.dart';
 import '../subscription/plan_view_model.dart';
+
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
 
@@ -25,13 +26,13 @@ class _AccountScreenState extends State<AccountScreen> {
     if (planVm.expiresAt == null) return 'No Plan';
     final now = DateTime.now();
     final remaining = planVm.expiresAt!.difference(now);
-    
+
     if (remaining.isNegative) return 'Expired';
-    
+
     final days = remaining.inDays;
     final hours = remaining.inHours % 24;
     final minutes = remaining.inMinutes % 60;
-    
+
     if (days > 0) {
       return '${days}d Left';
     } else if (hours > 0) {
@@ -54,7 +55,7 @@ class _AccountScreenState extends State<AccountScreen> {
             children: [
               const SizedBox(height: 20),
 
-              // 🔹 TITLE
+              // title
               const Text(
                 "USER PROFILE",
                 style: TextStyle(
@@ -66,7 +67,7 @@ class _AccountScreenState extends State<AccountScreen> {
 
               const SizedBox(height: 20),
 
-              // 🔹 AVATAR
+              // avatar
               const CircleAvatar(
                 radius: 50,
                 backgroundImage: AssetImage('assets/images/user.png'),
@@ -74,7 +75,7 @@ class _AccountScreenState extends State<AccountScreen> {
 
               const SizedBox(height: 20),
 
-              // 🔹 CARD
+              // card
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -85,7 +86,7 @@ class _AccountScreenState extends State<AccountScreen> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 🔸 LEFT CONTENT
+                    // left content
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,7 +120,7 @@ class _AccountScreenState extends State<AccountScreen> {
                     ),
                     const SizedBox(width: 10),
 
-                    // 🔸 RIGHT BADGE
+                    // right badge
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
@@ -128,7 +129,11 @@ class _AccountScreenState extends State<AccountScreen> {
                       ),
                       child: Column(
                         children: [
-                          const Icon(Icons.percent, color: Colors.green, size: 30),
+                          const Icon(
+                            Icons.percent,
+                            color: Colors.green,
+                            size: 30,
+                          ),
                           const SizedBox(height: 6),
                           Text(
                             _getTimeLeft(planVm),

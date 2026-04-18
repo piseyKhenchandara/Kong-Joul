@@ -4,8 +4,10 @@ enum RideStatus {
 
   String get value {
     switch (this) {
-      case active:    return 'active';
-      case completed: return 'completed';
+      case active:
+        return 'active';
+      case completed:
+        return 'completed';
     }
   }
 }
