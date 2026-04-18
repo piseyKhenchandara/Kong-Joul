@@ -1,6 +1,8 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../model/active_ride.dart';
+import '../../model/bike_status.dart';
+import '../../model/ride_status.dart';
 
 class RideRepository {
   final _client = Supabase.instance.client;
@@ -19,11 +21,11 @@ class RideRepository {
       'start_station_id': stationId,
       'start_slot_number': slotNumber,
       'start_time': DateTime.now().toUtc().toIso8601String(),
-      'status': 'active',
+      'status': RideStatus.active.value,
     }).select().single();
 
     await _client.from('bikes').update({
-      'status': 'in_use',
+      'status': BikeStatus.inUse.value,
       'station_id': null,
       'slot_number': null,
     }).eq('id', bikeId);
@@ -43,14 +45,13 @@ class RideRepository {
       'end_slot_number': endSlotNumber,
       'end_time': DateTime.now().toUtc().toIso8601String(),
       'duration_seconds': durationSeconds,
-      'status': 'completed',
+      'status': RideStatus.completed.value,
     }).eq('id', rideId);
 
     await _client.from('bikes').update({
-      'status': 'available',
+      'status': BikeStatus.available.value,
       'station_id': endStationId,
       'slot_number': endSlotNumber,
     }).eq('id', bikeId);
   }
 }
-

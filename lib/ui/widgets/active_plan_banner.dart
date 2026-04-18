@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../model/plan.dart';
 
 class ActivePlanBanner extends StatefulWidget {
   final String planName;
@@ -46,21 +47,6 @@ class _ActivePlanBannerState extends State<ActivePlanBanner> {
     return '$h:$m:$s';
   }
 
-  String _formatPlanName(String name) {
-    switch (name) {
-      case "perRide":
-        return "Pay Per Ride";
-      case "daily":
-        return "Daily Pass";
-      case "weekly":
-        return "Weekly Pass";
-      case "monthly":
-        return "Monthly Pass";
-      default:
-        return name;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final isPerRide = widget.expiresAt == null;
@@ -82,7 +68,7 @@ class _ActivePlanBannerState extends State<ActivePlanBanner> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Active: ${_formatPlanName(widget.planName)}",
+                  "Active: ${PlanType.from(widget.planName).displayName}",
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,

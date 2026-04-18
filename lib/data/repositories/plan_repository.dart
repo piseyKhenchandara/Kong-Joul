@@ -1,5 +1,6 @@
 import 'package:mini_velo/data/dto/plan_dto.dart';
 import 'package:mini_velo/model/plan.dart';
+import 'package:mini_velo/model/ride_status.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class PlanRepository {
@@ -62,7 +63,7 @@ class PlanRepository {
         .from('rides')
         .select('duration_seconds')
         .eq('user_id', userId)
-        .eq('status', 'completed');
+        .eq('status', RideStatus.completed.value);
 
     if ((data as List).isEmpty) {
       return {'total_rides': 0, 'total_duration_seconds': 0};

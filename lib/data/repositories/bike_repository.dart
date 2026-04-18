@@ -1,6 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../model/bike.dart';
+import '../../model/bike_status.dart';
 import '../dto/bike_dto.dart';
 
 class BikeRepository {
@@ -11,7 +12,7 @@ class BikeRepository {
         .from('bikes')
         .select()
         .eq('station_id', stationId)
-        .eq('status', 'available')
+        .eq('status', BikeStatus.available.value)
         .order('slot_number', ascending: true);
     return (data as List)
         .map((e) => BikeDto.fromJson(e as Map<String, dynamic>).toBike())
