@@ -55,7 +55,7 @@ class _AccountScreenState extends State<AccountScreen> {
             children: [
               const SizedBox(height: 20),
 
-              // 🔹 TITLE
+              // title
               const Text(
                 "USER PROFILE",
                 style: TextStyle(
@@ -67,7 +67,7 @@ class _AccountScreenState extends State<AccountScreen> {
 
               const SizedBox(height: 20),
 
-              // 🔹 AVATAR
+              // avatar
               const CircleAvatar(
                 radius: 50,
                 backgroundImage: AssetImage('assets/images/user.png'),
@@ -75,7 +75,7 @@ class _AccountScreenState extends State<AccountScreen> {
 
               const SizedBox(height: 20),
 
-              // 🔹 CARD
+              // card
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -86,7 +86,7 @@ class _AccountScreenState extends State<AccountScreen> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 🔸 LEFT CONTENT
+                    // left content
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,7 +120,7 @@ class _AccountScreenState extends State<AccountScreen> {
                     ),
                     const SizedBox(width: 10),
 
-                    // 🔸 RIGHT BADGE
+                    // right badge
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(

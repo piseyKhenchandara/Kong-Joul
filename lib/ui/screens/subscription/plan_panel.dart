@@ -33,7 +33,7 @@ class PlanPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 🔹 TOP ROW
+          // top row
           Row(
             children: [
               Image.asset(
@@ -63,7 +63,7 @@ class PlanPanel extends StatelessWidget {
 
           const SizedBox(height: 12),
 
-          // 🔹 DESCRIPTION
+          // description
           Text(
             _getDescription(plan.time),
             style: const TextStyle(color: Colors.grey),
@@ -71,7 +71,7 @@ class PlanPanel extends StatelessWidget {
 
           const SizedBox(height: 12),
 
-          // 🔹 BOTTOM ROW
+          // bottom row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -94,7 +94,7 @@ class PlanPanel extends StatelessWidget {
     );
   }
 
-  // 🔹 helper: description
+  // helper: description
   String _getDescription(int time) {
     if (time == 0) return "One ride only";
     if (time == 24) return "Full day access";
@@ -103,7 +103,7 @@ class PlanPanel extends StatelessWidget {
     return "$time days access";
   }
 
-  // 🔹 helper: time text
+  // helper: time text
   String _getTimeText(int time) {
     if (time == 0) return "1 Ride";
     return "${time * 24} hrs";

@@ -83,7 +83,7 @@ class _PlansScreenState extends State<PlansScreen> {
 
           const SizedBox(height: 10),
 
-          // 🔹 active plan banner with countdown
+          // active plan banner with countdown
           if (vm.activePlan != null)
             ActivePlanBanner(
               planName: vm.activePlan!.planName,
