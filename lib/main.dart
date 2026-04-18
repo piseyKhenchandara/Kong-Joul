@@ -7,6 +7,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:mini_velo/data/repositories/plan_repository.dart';
 import 'package:mini_velo/ui/screens/subscription/plan_view_model.dart';
+import 'ui/screens/login/login_screen.dart';
+import 'ui/screens/shell/main_shell.dart';
+import 'ui/theme/app_theme.dart';
 
 import 'ui/screens/welcome/welcome_screen.dart';
 void main() async {
@@ -37,6 +40,8 @@ class VeloToulouseApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: const WelcomeScreen(),
       theme: AppTheme.light(),
+      // home: const AuthGate(),
+      // theme: AppTheme.light(),
       // home: const AuthGate(),
     );
   }

@@ -32,6 +32,7 @@ class _LoginView extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
+              AppColors.primary.withOpacity(0.14),
               AppColors.background,
               const Color(0xFFF7FAF4),
             ],
@@ -185,6 +186,7 @@ class _Header extends StatelessWidget {
           width: 88,
           height: 88,
           decoration: BoxDecoration(
+            color: AppColors.primary.withOpacity(0.16),
             shape: BoxShape.circle,
           ),
           child: const Icon(
