@@ -1,8 +1,10 @@
+import 'bike_status.dart';
+
 class Bike {
   final String id;
   final String bikeNumber;
   final int slotNumber;
-  final String status;
+  final BikeStatus status;
 
   const Bike({
     required this.id,

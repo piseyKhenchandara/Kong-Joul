@@ -11,21 +11,6 @@ class PaymentConfirmSheet extends StatelessWidget {
     required this.onConfirm,
   });
 
-  String _formatPlanName(String name) {
-    switch (name) {
-      case "perRide":
-        return "Pay Per Ride";
-      case "daily":
-        return "Daily Pass";
-      case "weekly":
-        return "Weekly Pass";
-      case "monthly":
-        return "Monthly Pass";
-      default:
-        return name;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -69,7 +54,7 @@ class PaymentConfirmSheet extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _formatPlanName(plan.planName),
+                        plan.type.displayName,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

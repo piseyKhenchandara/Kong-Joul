@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../theme/app_colors.dart';
 import '../subscription/plan_view_model.dart';
-
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
 
@@ -20,21 +19,6 @@ class _AccountScreenState extends State<AccountScreen> {
       final planVm = context.read<PlanViewModel>();
       planVm.fetchUserPlan(_userId);
     });
-  }
-
-  String _formatPlanName(String planName) {
-    switch (planName) {
-      case 'per_ride':
-        return 'Pay Per Ride';
-      case 'daily':
-        return 'Daily Pass';
-      case 'weekly':
-        return 'Weekly Pass';
-      case 'monthly':
-        return 'Monthly Pass';
-      default:
-        return planName;
-    }
   }
 
   String _getTimeLeft(PlanViewModel planVm) {
@@ -116,7 +100,7 @@ class _AccountScreenState extends State<AccountScreen> {
                           const SizedBox(height: 12),
                           Text(
                             planVm.activePlan != null
-                                ? "Active Plan: ${_formatPlanName(planVm.activePlan!.planName)}"
+                                ? "Active Plan: ${planVm.activePlan!.type.displayName}"
                                 : "Active Plan: None",
                             style: const TextStyle(fontSize: 14),
                           ),

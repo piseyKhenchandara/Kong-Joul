@@ -49,7 +49,7 @@ class PlanPanel extends StatelessWidget {
 
               Expanded(
                 child: Text(
-                  _formatName(plan.planName),
+                  plan.type.displayName,
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -92,22 +92,6 @@ class PlanPanel extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  // 🔹 helper: format name
-  String _formatName(String name) {
-    switch (name) {
-      case "perRide":
-        return "Pay Per Ride";
-      case "daily":
-        return "Daily Pass";
-      case "weekly":
-        return "Weekly Pass";
-      case "monthly":
-        return "Monthly Pass";
-      default:
-        return name;
-    }
   }
 
   // 🔹 helper: description

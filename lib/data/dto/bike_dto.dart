@@ -1,10 +1,11 @@
 import '../../model/bike.dart';
+import '../../model/bike_status.dart';
 
 class BikeDto {
   final String id;
   final String bikeNumber;
   final int slotNumber;
-  final String status;
+  final BikeStatus status;
 
   const BikeDto({
     required this.id,
@@ -17,7 +18,7 @@ class BikeDto {
         id: json['id'] as String,
         bikeNumber: json['bike_number'] as String,
         slotNumber: (json['slot_number'] as int?) ?? 0,
-        status: json['status'] as String,
+        status: BikeStatus.from(json['status'] as String),
       );
 
   Bike toBike() => Bike(

@@ -1,14 +1,34 @@
-// enum PlanEnum {
-//   perRide(3, 0),
-//   daily(5, 24),
-//   weekly(30, 168),
-//   monthly(100, 720);
+enum PlanType {
+  perRide,
+  daily,
+  weekly,
+  monthly;
 
-//   final int price;
-//   final int hour;
+  /// The value stored in the Supabase `name` column.
+  String get dbValue {
+    switch (this) {
+      case perRide: return 'per_ride';
+      case daily:   return 'daily';
+      case weekly:  return 'weekly';
+      case monthly: return 'monthly';
+    }
+  }
 
-//   const PlanEnum(this.price, this.hour);
-// }
+  String get displayName {
+    switch (this) {
+      case perRide: return 'Pay Per Ride';
+      case daily:   return 'Daily Pass';
+      case weekly:  return 'Weekly Pass';
+      case monthly: return 'Monthly Pass';
+    }
+  }
+
+  static PlanType from(String value) => PlanType.values.firstWhere(
+        // handle both 'per_ride' (DB) and 'perRide' (legacy) forms
+        (e) => e.dbValue == value || e.name == value,
+        orElse: () => PlanType.perRide,
+      );
+}
 
 class Plan {
   final String id;
@@ -23,12 +43,5 @@ class Plan {
     required this.id,
   });
 
-  // // Factory constructor (better than your method)
-  // factory Plan.fromEnum(PlanEnum planEnum) {
-  //   return Plan(
-  //     planName: planEnum.name,
-  //     price: planEnum.price.toDouble(),
-  //     time: planEnum.hour, id: '',
-  //   );
-  // }
+  PlanType get type => PlanType.from(planName);
 }
