@@ -24,7 +24,11 @@ class StationDetailPanel extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         boxShadow: [
-          BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, -2)),
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 10,
+            offset: Offset(0, -2),
+          ),
         ],
       ),
       child: Column(
@@ -48,7 +52,10 @@ class StationDetailPanel extends StatelessWidget {
                 Expanded(
                   child: Text(
                     vm.station.name,
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 GestureDetector(
@@ -130,46 +137,54 @@ class StationDetailPanel extends StatelessWidget {
           else if (vm.error != null)
             Padding(
               padding: const EdgeInsets.all(16),
-              child: Text('Error: ${vm.error}',
-                  style: const TextStyle(color: Colors.red)),
+              child: Text(
+                'Error: ${vm.error}',
+                style: const TextStyle(color: Colors.red),
+              ),
             )
           else
             Flexible(
               child: _BikePanelList(
                 bikes: vm.bikes,
-                isStartingRide: vm.isStartingRide,  // Disables taps while starting
+                isStartingRide:
+                    vm.isStartingRide, // Disables taps while starting
                 onBikeTap: (bike) async {
                   final mapVm = context.read<MapViewModel>();
                   final detailVm = context.read<StationDetailViewModel>();
                   final planVm = context.read<PlanViewModel>();
 
                   // Check if user has Pay Per Ride plan active
-                  if (planVm.activePlan != null && planVm.activePlan?.type == PlanType.perRide) {
+                  if (planVm.activePlan != null &&
+                      planVm.activePlan?.type == PlanType.perRide) {
                     // Get the Pay Per Ride plan from all plans
                     try {
-                      final payPerRidePlan = planVm.plans
-                          .firstWhere((p) => p.type == PlanType.perRide);
+                      final payPerRidePlan = planVm.plans.firstWhere(
+                        (p) => p.type == PlanType.perRide,
+                      );
                       final userId = "9e2536f0-d025-420c-9112-ec279dc6b146";
-                      
+
                       if (context.mounted) {
                         // Show payment sheet
                         showModalBottomSheet(
                           context: context,
                           shape: const RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.vertical(top: Radius.circular(24)),
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(24),
+                            ),
                           ),
                           builder: (_) => PaymentConfirmSheet(
                             plan: payPerRidePlan,
                             onConfirm: () async {
                               if (!context.mounted) return;
                               Navigator.pop(context);
-                              
-                              final success =
-                                  await planVm.buyPlan(userId, payPerRidePlan);
-                              
+
+                              final success = await planVm.buyPlan(
+                                userId,
+                                payPerRidePlan,
+                              );
+
                               if (!context.mounted) return;
-                              
+
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
@@ -177,11 +192,12 @@ class StationDetailPanel extends StatelessWidget {
                                         ? 'Plan activated!'
                                         : 'Purchase failed. Try again.',
                                   ),
-                                  backgroundColor:
-                                      success ? Colors.green : Colors.red,
+                                  backgroundColor: success
+                                      ? Colors.green
+                                      : Colors.red,
                                 ),
                               );
-                              
+
                               // If payment successful, proceed with renting the bike
                               if (success && context.mounted) {
                                 final ride = await detailVm.startRide(bike);
